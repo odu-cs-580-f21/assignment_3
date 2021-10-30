@@ -1,0 +1,6 @@
+- read txt
+- fill cells with taken spots
+- calculate domain for each cell on the board
+- find x cell which has the smallest domain
+- try first n number in the domain on x cell
+- remove n number from x cell domain and from blocking cells which are directly under or across from cell x

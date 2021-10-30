@@ -1,67 +1,57 @@
-file = open('board.txt', "r")
+from pprint import pprint
+import time
+import sys
+start_time = time.time()
 
-counter = 0
-board = []
-DOMAIN = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+def find_next_empty(board):
+    for r in range(9):
+        for c in range(9):
+            if board[r][c] == 0:
+                return r, c
+    return None, None
 
-for line in file:
-    board.append(line.replace('\n', ''))
-    counter += 1
-
-
-print('Our board \n')
-for line in board:
-    print(line, '\t') 
-
-print('\n')
-
-def checkBox(pos:int):
-    pass
-
-def checkCol(pos:int):
-    domain = DOMAIN
-    col_index = 0
-    col_nums = []
-    for col in board:
-        col_nums.append(int(board[col_index][pos]))
-        col_index += 1
+def is_valid(board, guess, row, col):
+    row_val = board[row]
+    if guess in row_val:
+        return False
     
-    for num in col_nums:
-        if num in domain:
-            domain.remove(num)
-        else:
-            pass
+    col_val = [board[i][col] for i in range(9)]
+    if guess in col_val:
+        return False
 
-    return domain
+    row_start = (row // 3) * 3
+    col_start = (col // 3) * 3
 
-def checkRow(pos:int):
-    domain = DOMAIN
-    row_index = 0
-    row_nums = []
-    for row in board:
-        row_nums.append(int(board[pos][row_index]))
-        row_index += 1
-    
-    for num in row_nums:
-        if num in domain:
-            domain.remove(num)
-        else:
-            pass
+    for r in range(row_start, row_start + 3):
+        for c in range(col_start, col_start + 3):
+            if board[r][c] == guess:
+                return False
+    return True
 
-    return domain
+def solve(board):
+    row, col = find_next_empty(board)
+    if row == None:
+        return True
+    for guess in range(1, 10):
+        if is_valid(board, guess, row, col):
+            board[row][col] = guess
+            if solve(board):
+                pprint(board)
+                return True
+        board[row][col] = 0
+    return False
 
-def getDomain(row, col):
-    bigDomain = row + col
+if __name__ == '__main__':
+    file = open(sys.argv[1], "r")
+    board = []
 
-    temp_list = []
+    for line in file:
+        row = []
+        cleared_line = line.replace('\n', '')
+        for ch in cleared_line:
+            row.append(int(ch))
+        board.append(row)
 
-    for i in bigDomain:
-        if i not in temp_list:
-            temp_list.append(i)
-
-    bigDomain = temp_list
-
-    return bigDomain
-
-
-print(getDomain(checkRow(1), checkCol(1)))
+    solve(board)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    file.close()
